@@ -66,17 +66,17 @@ def main(argv: list[str] | None = None) -> int:
         len(seeds), total_elements, len(unresolved),
     )
 
-    out = collect_key_facilities(
-        model,
-        seeds,
-        hops=args.hops,
-        kv_min=args.kv_min,
-        kv_max=args.kv_max,
-        gen_min_mw=args.gen_min_mw,
-    )
-    # collect_key_facilities returns an empty `unresolved` DataFrame in its dict;
-    # use the one from resolve_elements instead.
-    out["unresolved"] = unresolved
+    out = {
+        **collect_key_facilities(
+            model,
+            seeds,
+            hops=args.hops,
+            kv_min=args.kv_min,
+            kv_max=args.kv_max,
+            gen_min_mw=args.gen_min_mw,
+        ),
+        "unresolved": unresolved,
+    }
 
     summary_parts = []
     for name, df in out.items():
