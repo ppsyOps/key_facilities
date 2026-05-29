@@ -1,0 +1,17 @@
+[project]
+name = "key-facilities"
+version = "0.1.0"
+description = "CLI for extracting key facilities near PSS/E flowgate elements."
+requires-python = ">=3.10"
+dependencies = [
+    "pandas",
+    "networkx",
+    # psse-model-util is installed editably in dev: `pdm add -e ../psse_model_util`
+]
+
+[project.scripts]
+key-facilities = "key_facilities:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

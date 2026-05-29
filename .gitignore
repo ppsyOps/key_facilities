@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+_smoke_out/
+dist/
+*.egg-info/
