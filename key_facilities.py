@@ -1,10 +1,15 @@
 """CLI for extracting key facilities near PSS/E flowgate elements.
 
 Usage:
-    python key_facilities.py --mon FLOWGATES.mon --raw MODEL.raw --out-dir OUT/
+    python key_facilities.py --mon FLOWGATES.mon --raw MODEL.raw \\
+        --areas 1 2 3 --out-dir OUT/
 
 Writes branches.csv, generators.csv, transformers_3w.csv, unresolved.csv
 to --out-dir.
+
+The --areas argument is required: it restricts the search to those PSS/E
+area IDs. Seeds whose buses fall outside the listed areas will appear in
+unresolved.csv with reason 'bus_not_found'.
 """
 from __future__ import annotations
 
@@ -33,6 +38,17 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--mon", required=True, type=Path, help="Path to .mon flowgate file")
     p.add_argument("--raw", required=True, type=Path, help="Path to PSS/E .raw model")
+    p.add_argument(
+        "--areas",
+        required=True,
+        type=int,
+        nargs="+",
+        metavar="AREA_ID",
+        help=(
+            "Area IDs (integers) restricting the search domain. Required; "
+            "no default. Example: --areas 1 2 3"
+        ),
+    )
     p.add_argument("--out-dir", required=True, type=Path, help="Output directory for CSVs")
     p.add_argument("--hops", type=int, default=DEFAULT_HOPS)
     p.add_argument("--kv-min", type=float, default=DEFAULT_KV_MIN)
@@ -59,6 +75,12 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     model = Model(args.raw)
+    # Restrict the search domain to the requested areas before resolution.
+    # Network.filter_by_area keeps any equipment with at least one bus in the
+    # area set, mutates in place, and clears the cached graph.
+    model.network.filter_by_area(args.areas, inplace=True)
+    logger.info("Filtered model to areas %s", sorted(set(args.areas)))
+
     seeds, unresolved = resolve_elements(fgs_filtered, model)
     total_elements = sum(len(fg.monitor) + len(fg.contingency) for fg in fgs_filtered)
     logger.info(
