@@ -24,7 +24,6 @@ from psse_model_util.flowgate import (
     DEFAULT_HOPS,
     DEFAULT_KV_MAX,
     DEFAULT_KV_MIN,
-    DEFAULT_SC,
     collect_key_facilities,
     filter_by_sc,
     parse_mon_file,
@@ -54,7 +53,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--kv-min", type=float, default=DEFAULT_KV_MIN)
     p.add_argument("--kv-max", type=float, default=DEFAULT_KV_MAX)
     p.add_argument("--gen-min-mw", type=float, default=DEFAULT_GEN_MIN_MW)
-    p.add_argument("--sc", default=DEFAULT_SC, help="Security Coordinator filter")
+    p.add_argument("--sc", required=True, help="Security Coordinator filter")
     p.add_argument("-v", "--verbose", action="store_true")
     return p.parse_args(argv)
 
