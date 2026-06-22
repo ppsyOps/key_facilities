@@ -2,7 +2,7 @@
 name = "key-facilities"
 version = "0.1.0"
 description = "CLI for extracting key facilities near PSS/E flowgate elements."
-requires-python = ">=3.10"
+requires-python = ">=3.11,!=3.14.1,<3.15"
 dependencies = [
     "pandas",
     "networkx",
@@ -15,3 +15,33 @@ key-facilities = "key_facilities:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pdm.dev-dependencies]
+# psse-model-util is a sibling repo installed editably into the venv
+# (`pdm run pip install -e ../psse_model_util`); see README. It is not listed
+# here because PDM cannot resolve the unpublished local path on lock.
+test = [
+    "pytest>=8",
+    "pytest-cov",
+]
+
+[tool.pytest.ini_options]
+# key_facilities.py lives at the repo root; put it on sys.path so tests can
+# `import key_facilities` without an installed console-script entry point.
+pythonpath = ["."]
+testpaths = ["tests"]
+# Always measure coverage so the fail_under gate (see [tool.coverage.report])
+# is enforced on every `pytest` run, not just when --cov is passed.
+addopts = "--cov=key_facilities --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["key_facilities"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+# CI gate. Goal is 100%; the gate is set below current coverage as a ratchet.
+fail_under = 95
