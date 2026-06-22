@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Test & Coverage
+    runs-on: ubuntu-latest
+    env:
+      # platformdirs' site_data_dir defaults to /usr/local/share (root-only on
+      # the GHA runner). Redirect it to a writable path so Model.__init__'s
+      # pickle cache can be written during the end-to-end CLI tests.
+      XDG_DATA_DIRS: /tmp/psse-site-data
+    steps:
+      - name: Checkout key_facilities
+        uses: actions/checkout@v4
+        with:
+          path: key_facilities
+
+      # key_facilities depends on the (unpublished) sibling psse_model_util.
+      # Both repos are public, so the default GITHUB_TOKEN can clone it.
+      - name: Checkout psse_model_util (sibling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ppsyOps/psse_model_util
+          ref: main
+          path: psse_model_util
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PDM
+        run: pip install pdm
+
+      - name: Install test dependencies
+        working-directory: key_facilities
+        run: pdm install -G test
+
+      - name: Install psse_model_util (editable sibling)
+        working-directory: key_facilities
+        run: pdm run pip install -e ../psse_model_util
+
+      - name: Run pytest (enforces the 95% coverage gate)
+        working-directory: key_facilities
+        run: pdm run pytest
