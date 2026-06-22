@@ -12,6 +12,7 @@ python key_facilities.py \
   --mon path/to/flowgates.mon \
   --raw path/to/Model.raw \
   --areas 1 2 3 \
+  --sc PJM \
   --out-dir outputs/
 ~~~
 
@@ -23,10 +24,12 @@ Required arguments:
   domain. The model is filtered to keep only equipment touching these
   areas before resolution. Seeds whose buses fall outside the listed
   areas appear in `unresolved.csv` with reason `bus_not_found`.
+- `--sc` - security-coordinator code; only flowgates with this SC are
+  processed.
 - `--out-dir` - output directory for the CSVs (created if missing).
 
 Optional overrides: `--hops 4`, `--kv-min 160`, `--kv-max 765`,
-`--gen-min-mw 15`, `--sc PJM`.
+`--gen-min-mw 15`, `-v`/`--verbose`.
 
 ## Output
 
