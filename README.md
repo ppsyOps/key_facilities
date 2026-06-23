@@ -12,7 +12,7 @@ python key_facilities.py \
   --mon path/to/flowgates.mon \
   --raw path/to/Model.raw \
   --areas 1 2 3 \
-  --sc PJM \
+  --sc SCA \
   --out-dir outputs/
 ~~~
 
@@ -45,17 +45,21 @@ Four CSV files in `--out-dir`:
 
 ## Installation
 
-This repo depends on `psse_model_util`, which is developed as a sibling repo.
-For development, either install it editably:
-
 ~~~
-pip install -e ../psse_model_util
+pip install --pre key-facilities
 ~~~
 
-or set `PYTHONPATH` to the parent of the `psse_model_util` project dir (the
-grandparent of this repo) so Python can import the package via the flat
-layout:
+This pulls in `psse-model-util` from PyPI automatically. `--pre` is required
+while both packages are pre-releases. After install, use the console script:
 
 ~~~
-PYTHONPATH=.. python key_facilities.py ...
+key-facilities --mon path/to/flowgates.mon --raw path/to/Model.raw \
+  --areas 1 2 3 --sc SCA --out-dir outputs/
+~~~
+
+### Development
+
+~~~
+pip install -e ../psse_model_util   # sibling repo, editable
+pip install -e .
 ~~~

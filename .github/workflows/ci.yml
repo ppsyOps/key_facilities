@@ -14,41 +14,21 @@ jobs:
       # pickle cache can be written during the end-to-end CLI tests.
       XDG_DATA_DIRS: /tmp/psse-site-data
     steps:
-      - name: Checkout key_facilities
-        uses: actions/checkout@v4
-        with:
-          path: key_facilities
-
-      # key_facilities depends on the (unpublished) sibling psse_model_util.
-      # Both repos are public, so the default GITHUB_TOKEN can clone it.
-      - name: Checkout psse_model_util (sibling dependency)
-        uses: actions/checkout@v4
-        with:
-          repository: ppsyOps/psse_model_util
-          ref: main
-          path: psse_model_util
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install PDM
-        run: pip install pdm
-
-      - name: Install test dependencies
-        working-directory: key_facilities
-        run: pdm install -G test
-
-      - name: Install psse_model_util (editable sibling) into the PDM venv
-        working-directory: key_facilities
-        # Use the venv's own python (`pdm run python -m pip`) so the editable
-        # install lands in the PDM venv, not a PATH pip. ensurepip first because
-        # PDM venvs ship without pip.
+      # Installs key-facilities (editable) plus its runtime deps from PyPI,
+      # including psse-model-util. --pre is needed while psse-model-util is a
+      # pre-release. pytest config adds the repo root to sys.path.
+      - name: Install package + test deps
         run: |
-          pdm run python -m ensurepip --upgrade
-          pdm run python -m pip install -e ../psse_model_util
+          python -m pip install --upgrade pip
+          python -m pip install --pre -e .
+          python -m pip install pytest pytest-cov
 
       - name: Run pytest (enforces the 95% coverage gate)
-        working-directory: key_facilities
-        run: pdm run pytest
+        run: pytest
