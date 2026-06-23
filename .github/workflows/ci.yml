@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      # Installs key-facilities (editable) plus its runtime deps from PyPI,
+      # Installs flowgate-key-facilities (editable) plus its runtime deps from PyPI,
       # including psse-model-util. --pre is needed while psse-model-util is a
       # pre-release. pytest config adds the repo root to sys.path.
       - name: Install package + test deps

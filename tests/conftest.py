@@ -1,4 +1,4 @@
-"""Shared fixtures for the key_facilities CLI tests.
+"""Shared fixtures for the flowgate_key_facilities CLI tests.
 
 Fixtures live in tests/data/ and are copies of the psse_model_util test
 fixtures (Model_1.raw, synthetic_flowgates.mon). The .mon defines four
