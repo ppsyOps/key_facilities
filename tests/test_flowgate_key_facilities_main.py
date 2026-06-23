@@ -1,4 +1,4 @@
-"""End-to-end tests for flowgate_key_facilities.main().
+"""End-to-end tests for psse_utils.flowgate_key_facilities.main().
 
 main() runs the full pipeline in-process (parse .mon -> filter by SC ->
 load + area-filter the model -> resolve seeds -> collect neighborhood ->
@@ -11,7 +11,7 @@ import pandas as pd
 import pytest
 from psse_model_util.common.dirs import clear_cache
 
-from flowgate_key_facilities import main
+from psse_utils.flowgate_key_facilities import main
 
 OUTPUT_CSVS = ["branches.csv", "generators.csv", "transformers_3w.csv", "unresolved.csv"]
 

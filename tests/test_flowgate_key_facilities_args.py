@@ -1,4 +1,4 @@
-"""Unit tests for flowgate_key_facilities._parse_args (the CLI contract).
+"""Unit tests for psse_utils.flowgate_key_facilities._parse_args (the CLI contract).
 
 These are fast and fixture-free: they assert which arguments are required,
 that the optional overrides default to the flowgate package constants, and
@@ -16,7 +16,7 @@ from psse_model_util.flowgate import (
     DEFAULT_KV_MIN,
 )
 
-from flowgate_key_facilities import _parse_args
+from psse_utils.flowgate_key_facilities import _parse_args
 
 # A minimal complete set of the five required arguments.
 REQUIRED = [

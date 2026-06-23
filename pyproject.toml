@@ -1,7 +1,7 @@
 [project]
-name = "flowgate-key-facilities"
-version = "0.1.0b1"
-description = "Identify key facilities (lines & generators) whose outage would most impact a set of PSS/E flowgates."
+name = "psse-utils"
+dynamic = ["version"]
+description = "A collection of small PSS/E utility scripts built on psse-model-util."
 readme = "README.md"
 requires-python = ">=3.11,!=3.14.1,<3.15"
 license = "MIT"
@@ -9,7 +9,7 @@ license-files = ["LICENSE"]
 authors = [
     { name = "cadvena" }
 ]
-keywords = ["psse", "power systems", "flowgate", "PSS/E", "key facilities"]
+keywords = ["psse", "power systems", "PSS/E", "scripts", "flowgate"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -28,37 +28,37 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ppsyOps/flowgate_key_facilities"
-Repository = "https://github.com/ppsyOps/flowgate_key_facilities"
-Issues = "https://github.com/ppsyOps/flowgate_key_facilities/issues"
+Homepage = "https://github.com/ppsyOps/psse_utils"
+Repository = "https://github.com/ppsyOps/psse_utils"
+Issues = "https://github.com/ppsyOps/psse_utils/issues"
 
 [project.scripts]
-flowgate-key-facilities = "flowgate_key_facilities:main"
+flowgate-key-facilities = "psse_utils.flowgate_key_facilities:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "src/psse_utils/__about__.py"
+pattern = "__version__ = ['\"](?P<version>[^'\"]+)['\"]"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/psse_utils"]
+
 [tool.pdm.dev-dependencies]
-# psse-model-util is a sibling repo installed editably into the venv
-# (`pdm run pip install -e ../psse_model_util`); see README. It is not listed
-# here because PDM cannot resolve the unpublished local path on lock.
 test = [
     "pytest>=8",
     "pytest-cov",
 ]
 
 [tool.pytest.ini_options]
-# flowgate_key_facilities.py lives at the repo root; put it on sys.path so tests
-# can `import flowgate_key_facilities` without an installed console-script entry point.
-pythonpath = ["."]
 testpaths = ["tests"]
-# Always measure coverage so the fail_under gate (see [tool.coverage.report])
-# is enforced on every `pytest` run, not just when --cov is passed.
-addopts = "--cov=flowgate_key_facilities --cov-report=term-missing"
+# Always measure coverage so the fail_under gate is enforced on every run.
+addopts = "--cov=psse_utils --cov-report=term-missing"
 
 [tool.coverage.run]
-source = ["flowgate_key_facilities"]
+source = ["src/psse_utils"]
 
 [tool.coverage.report]
 exclude_lines = [

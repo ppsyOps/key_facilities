@@ -1,85 +1,55 @@
-# flowgate-key-facilities
+# psse-utils
 
-Identify the **key facilities** for a set of PSS/E flowgates — the equipment
-whose loss (damage or outage) would most likely have a high impact on those
-flowgates.
-
-Given a flowgate-definition file (`.mon`) and a PSS/E model (`.raw`), this tool
-finds, for each flowgate, the nearby high-impact equipment and writes it to CSVs.
-
-## What it does
-
-A flowgate (defined in the `.mon` file) is a set of monitored/contingency
-elements. Equipment electrically *close* to those elements is the most likely to
-matter if it goes out. "Key facilities" are selected with a deliberately simple,
-transparent rule — for each flowgate in the `.mon` file:
-
-1. Resolve the flowgate's elements to buses in the `.raw` model.
-2. Take the **electrical neighborhood**: every bus within **`n` buses (hops)** of
-   those elements (`--hops`, default 4).
-3. From that neighborhood, keep the high-impact facilities:
-   - **AC lines / 2-winding transformers** whose voltage is in a **kV range**
-     (`--kv-min` / `--kv-max`, default 160–765 kV).
-   - **Generators** with **PMax ≥ a threshold** (`--gen-min-mw`, default 15 MW).
-   - **3-winding transformers** touching the neighborhood within the kV range.
-
-It is *not* a contingency analysis or a flow-impact calculation — it's a fast,
-proximity-based screen to surface candidate key facilities for further study.
+A collection of small PSS/E utility scripts built on
+[`psse-model-util`](https://pypi.org/project/psse-model-util/). Instead of a new
+repo + PyPI project per script, scripts live here and ship as one package.
 
 ## Installation
 
 ~~~
-pip install --pre flowgate-key-facilities
+pip install --pre psse-utils
 ~~~
 
-This pulls in `psse-model-util` (the engine) from PyPI automatically. `--pre` is
-required while both packages are pre-releases.
+`--pre` is required while this package (and `psse-model-util`) are pre-releases.
 
-## Usage
+## Scripts
+
+### `flowgate-key-facilities`
+
+Identify the **key facilities** for a set of PSS/E flowgates — the equipment
+whose outage would most likely have a high impact on those flowgates. For each
+flowgate in a `.mon` file, it keeps AC lines in a kV range and generators above a
+PMax, all within `n` buses (hops) of the flowgate's elements, and writes the
+results to CSVs.
 
 ~~~
 flowgate-key-facilities \
-  --mon path/to/flowgates.mon \
-  --raw path/to/Model.raw \
-  --areas 1 2 3 \
-  --sc SCA \
-  --out-dir outputs/
+  --mon flowgates.mon --raw Model.raw \
+  --areas 1 2 3 --sc SCA --out-dir outputs/
 ~~~
 
-Required arguments:
+Full options: `flowgate-key-facilities --help`. Outputs `branches.csv`,
+`generators.csv`, `transformers_3w.csv`, `unresolved.csv` in `--out-dir`.
 
-- `--mon` — PSS/E `.mon` flowgate-definition file.
-- `--raw` — PSS/E `.raw` model file.
-- `--areas` — one or more area IDs (integers) restricting the search domain. The
-  model is filtered to keep only equipment touching these areas before
-  resolution. Seeds whose buses fall outside the listed areas appear in
-  `unresolved.csv` with reason `bus_not_found`.
-- `--sc` — security-coordinator code; only flowgates with this SC are processed.
-- `--out-dir` — output directory for the CSVs (created if missing).
+## Adding a script
 
-Selection overrides (the "key facility" thresholds):
-
-- `--hops` — neighborhood radius in buses (default 4).
-- `--kv-min` / `--kv-max` — line/transformer voltage range to keep (default 160 / 765).
-- `--gen-min-mw` — minimum generator PMax to keep (default 15).
-- `-v` / `--verbose` — debug logging.
-
-## Output
-
-Four CSV files in `--out-dir`:
-
-- `branches.csv` — AC lines and 2W transformers within `--hops` buses of any
-  flowgate element, filtered to `--kv-min <= kV <= --kv-max` (either end).
-- `generators.csv` — generators in the neighborhood with `PMax >= --gen-min-mw`.
-- `transformers_3w.csv` — 3W transformers with any winding in the neighborhood
-  and any winding bus in the kV range.
-- `unresolved.csv` — `.mon` elements that could not be resolved against the model
-  (bus name not found, branch not found, generator not found).
+1. Create `src/psse_utils/<name>.py` with the **logic as importable functions**
+   plus a thin `main(argv=None) -> int` that parses args and calls them (keeping
+   logic separate from the CLI leaves room for a future TUI/web UI).
+2. Add a console command in `pyproject.toml`:
+   `[project.scripts]` → `your-command = "psse_utils.<name>:main"`.
+3. Add tests `tests/test_<name>_*.py` (script-prefixed).
+4. Put any heavy/extra dependencies behind an extra in `[project.optional-dependencies]`.
 
 ## Development
 
 ~~~
-pip install -e ../psse_model_util   # sibling repo, editable
-pip install -e .
-pytest
+python -m venv .venv
+.venv\Scripts\python -m pip install --pre -e .
+.venv\Scripts\python -m pip install pytest pytest-cov
+.venv\Scripts\python -m pytest
 ~~~
+
+Versioning is CalVer (`YYYY.M.micro`) from `src/psse_utils/__about__.py`.
+Releases publish to PyPI via Trusted Publishing — see the team setup runbook and
+`psse-model-util`'s `docs/PUBLISHING.md`.
