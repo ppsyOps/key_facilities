@@ -1,7 +1,7 @@
 """CLI for extracting key facilities near PSS/E flowgate elements.
 
 Usage:
-    python key_facilities.py --mon FLOWGATES.mon --raw MODEL.raw \\
+    python flowgate_key_facilities.py --mon FLOWGATES.mon --raw MODEL.raw \\
         --areas 1 2 3 --out-dir OUT/
 
 Writes branches.csv, generators.csv, transformers_3w.csv, unresolved.csv
@@ -30,7 +30,7 @@ from psse_model_util.flowgate import (
     resolve_elements,
 )
 
-logger = logging.getLogger("key_facilities")
+logger = logging.getLogger("flowgate_key_facilities")
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
