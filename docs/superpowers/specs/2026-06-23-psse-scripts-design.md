@@ -49,8 +49,8 @@ src/psse_scripts/
     flowgate_key_facilities.py   # first script (moved from the old repo root)
     # <future scripts>.py
 tests/
-    test_cli_args.py
-    test_cli_main.py
+    test_flowgate_key_facilities_args.py
+    test_flowgate_key_facilities_main.py
     conftest.py
     data/   (Model_1.raw, synthetic_flowgates.mon)
 pyproject.toml  README.md  LICENSE
@@ -74,7 +74,8 @@ flowgate-key-facilities = "psse_scripts.flowgate_key_facilities:main"
 ```
 
 Adding a script = drop `psse_scripts/<name>.py` (logic + `main`), add one
-`[project.scripts]` line, add a test. No other wiring.
+`[project.scripts]` line, add tests named **`tests/test_<name>_*.py`** (script-
+prefixed so they stay unambiguous as the collection grows). No other wiring.
 
 ### Dependencies
 
@@ -112,7 +113,10 @@ Adding a script = drop `psse_scripts/<name>.py` (logic + `main`), add one
 3. Update `pyproject.toml`: name `psse-scripts`, CalVer version `…b1`, wheel/version
    paths, `[project.scripts]` (`flowgate-key-facilities = "psse_scripts.flowgate_key_facilities:main"`),
    deps, URLs, description/keywords.
-4. Update tests to import from `psse_scripts.flowgate_key_facilities`; fix coverage target.
+4. Rename test files to script-prefixed names (`test_cli_args.py` →
+   `test_flowgate_key_facilities_args.py`, `test_cli_main.py` →
+   `test_flowgate_key_facilities_main.py`); update imports to
+   `psse_scripts.flowgate_key_facilities`; fix the coverage target.
 5. Update `publish.yml` URLs and `ci.yml` (already pip-based) for the new name.
 6. Verify: `build` (wheel has `psse_scripts/…`, console script), `twine check`,
    `pytest` against the published `psse-model-util` beta, clean-venv install.
@@ -126,8 +130,10 @@ Adding a script = drop `psse_scripts/<name>.py` (logic + `main`), add one
 
 ## Testing
 
-- Keep the existing flowgate tests (renamed imports), enforcing the current
-  coverage gate.
+- Keep the existing flowgate tests, renamed to script-prefixed files
+  (`test_cli_args.py` → `test_flowgate_key_facilities_args.py`,
+  `test_cli_main.py` → `test_flowgate_key_facilities_main.py`) with imports
+  updated to `psse_scripts.flowgate_key_facilities`; enforce the current coverage gate.
 - Each new script ships with its own `tests/test_<name>_*.py`.
 - CI runs `pytest` against the **published** `psse-model-util` (real dependency
   resolution), as the flowgate repo already does.
